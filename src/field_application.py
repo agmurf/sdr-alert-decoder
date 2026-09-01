@@ -133,18 +133,25 @@ class ALERTFieldApp:
                                    width=6)
         self.ppm_entry.grid(row=1, column=3, sticky=tk.W, padx=5)
 
+        ttk.Label(control_frame, text="Gain (dB):").grid(
+            row=1, column=4, sticky=tk.E)
+        self.gain_var = tk.StringVar(value="40")
+        self.gain_entry = ttk.Entry(control_frame, textvariable=self.gain_var,
+                                    width=6)
+        self.gain_entry.grid(row=1, column=5, sticky=tk.W, padx=5)
+
         ttk.Label(control_frame, text="Protocol:").grid(
-            row=1, column=5, sticky=tk.E, padx=(15, 2))
+            row=1, column=7, sticky=tk.E, padx=(15, 2))
         self.protocol_var = tk.StringVar(value="iFLOWS")
         self.protocol_box = ttk.Combobox(
             control_frame, textvariable=self.protocol_var, width=16,
             state="readonly", values=("iFLOWS", "Enhanced iFLOWS", "ALERT2"))
-        self.protocol_box.grid(row=1, column=6, sticky=tk.W, padx=2)
+        self.protocol_box.grid(row=1, column=8, sticky=tk.W, padx=2)
 
         self.retune_btn = ttk.Button(control_frame, text="Apply Tuning",
                                      command=self.apply_tuning,
                                      state=tk.DISABLED)
-        self.retune_btn.grid(row=1, column=4, padx=5)
+        self.retune_btn.grid(row=1, column=6, padx=5)
 
         ttk.Label(control_frame, text="Signal:").grid(row=2, column=0, sticky=tk.W)
         self.signal_var = tk.StringVar(value="-100 dB")
@@ -222,6 +229,24 @@ class ALERTFieldApp:
             self.log("RTL-SDR not found. You can still decode WAV files.")
             self.log("For live monitoring, install RTL-SDR tools.")
 
+    def _get_gain(self):
+        """Tuner gain in dB from the GUI. Blank or 'auto' means tuner AGC.
+
+        Exposed because gain is the control for FRONT-END OVERLOAD: a close
+        transmitter drives the tuner into compression, which corrupts bit
+        decisions while the tones still look clean. It does not improve SNR.
+        """
+        raw = (self.gain_var.get() or "").strip().lower()
+        if raw in ("", "auto", "agc"):
+            return -1
+        try:
+            g = float(raw)
+        except ValueError:
+            self.gain_var.set("40")
+            return 40
+        g = max(0.0, min(49.6, g))
+        return g
+
     def _get_tuning(self):
         """Parse frequency (MHz->Hz) and PPM from the GUI; safe defaults."""
         try:
@@ -243,9 +268,13 @@ class ALERTFieldApp:
         if not self.monitoring or not self.rtl_sdr:
             return
         freq_hz, ppm = self._get_tuning()
-        ok = self.rtl_sdr.restart_with_params(ppm=ppm, frequency=freq_hz)
+        gain = self._get_gain()
+        ok = self.rtl_sdr.restart_with_params(ppm=ppm, frequency=freq_hz,
+                                              gain=gain)
         if ok:
-            self.log(f"Re-tuned to {freq_hz/1e6:.4f} MHz, PPM={ppm}")
+            gtxt = "auto" if gain == -1 else f"{gain:g} dB"
+            self.log(f"Re-tuned to {freq_hz/1e6:.4f} MHz, PPM={ppm}, "
+                     f"gain {gtxt}")
         else:
             self.log("Re-tune failed (RTL-SDR error)")
 
@@ -259,7 +288,7 @@ class ALERTFieldApp:
         freq_hz, ppm = self._get_tuning()
         self.rtl_sdr = IQSDRInterface(frequency=freq_hz,
                                       sample_rate=self.IQ_RATE,
-                                      gain=40, ppm=ppm)
+                                      gain=self._get_gain(), ppm=ppm)
         if not self.rtl_sdr.check_rtl_sdr():
             messagebox.showerror("Error", "RTL-SDR not detected.")
             return

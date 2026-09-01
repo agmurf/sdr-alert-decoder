@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -86,6 +88,7 @@ private fun DecoderScreen(
     val status by vm.status.collectAsState()
     val clipping by vm.clipping.collectAsState()
     val metaInfo by vm.metaInfo.collectAsState()
+    val tuning by vm.tuning.collectAsState()
 
     Column(Modifier.fillMaxSize().background(PageGrey)) {
 
@@ -128,6 +131,37 @@ private fun DecoderScreen(
                         maxLines = 1)
                 }
             }
+        }
+
+        // ---- tuning --------------------------------------------------
+        // Editable because ALERT is not on one channel nationally, and
+        // because gain is the control for front-end overload.
+        var mhz by remember(tuning) { mutableStateOf(tuning.megahertzText) }
+        var gain by remember(tuning) { mutableStateOf(tuning.gainText) }
+        var ppm by remember(tuning) { mutableStateOf(tuning.ppm.toString()) }
+        var tuneError by remember { mutableStateOf<String?>(null) }
+
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            TuneField("Freq (MHz)", mhz, Modifier.weight(1.6f)) { mhz = it }
+            TuneField("Gain (dB)", gain, Modifier.weight(1f)) { gain = it }
+            TuneField("PPM", ppm, Modifier.weight(0.9f)) { ppm = it }
+            Button(
+                onClick = { tuneError = vm.applyTuning(mhz, gain, ppm) },
+                modifier = Modifier.height(52.dp),
+                shape = RoundedCornerShape(4.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = BtnBlue)
+            ) { Text("SET", color = Color.White, fontSize = 13.sp) }
+        }
+        if (tuneError != null) {
+            Text(
+                tuneError!!, color = WarnOrange, fontSize = 13.sp,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
+            )
         }
 
         // ---- header + status ----------------------------------------
@@ -181,6 +215,25 @@ private fun DecoderScreen(
             Spacer(Modifier.navigationBarsPadding())
         }
     }
+}
+
+/** Compact labelled field for the tuning row. */
+@Composable
+private fun TuneField(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    onChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onChange,
+        label = { Text(label, fontSize = 11.sp) },
+        singleLine = true,
+        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        modifier = modifier
+    )
 }
 
 @Composable

@@ -112,6 +112,19 @@ The app requests **240 kHz**, chosen so the decimation is exact: 240000/20 =
 samples-per-symbol caused timing drift and wrecked vote counts on the desktop
 side, so it is worth preserving.
 
+## Tuning
+
+Frequency, gain and PPM are set in the app, in the row above the readings —
+type and tap **SET**. Values persist across restarts, and if the app is already
+listening the change is applied live (rtl_tcp accepts FREQ/GAIN commands at any
+time), so there is no need to stop and restart the driver.
+
+151.5 MHz is the NSW iFLOWS channel and remains the default, but ALERT is
+deployed on other VHF channels elsewhere, which is why this is not baked in.
+Entries outside 24–1766 MHz are refused rather than sent: the dongle reports
+success for an out-of-range tune and then delivers noise. Gain accepts a number
+in dB or `auto` for tuner AGC, and PPM is limited to ±200.
+
 ## Gain
 
 Gain does **not** improve SNR — measured on the desktop side, 40/44.5/49.6 dB
@@ -121,7 +134,7 @@ amplifies signal and noise together. What gain controls is headroom in the
 chase signal strength: if a nearby transmitter drives the front end into
 compression, bit decisions get corrupted while the tones still look clean (this
 actually happened during testing and silently corrupted a decode). Default is
-25 dB; lower it if the clipping warning appears.
+25 dB; lower it in the tuning row if the clipping warning appears.
 
 ## Sensor list
 

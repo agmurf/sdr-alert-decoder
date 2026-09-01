@@ -43,6 +43,16 @@ class DecoderViewModel(app: Application) : AndroidViewModel(app) {
 
     var protocol: Protocol = Protocol.IFLOWS
 
+    /** What the radio is tuned to, as the UI shows and edits it. */
+    data class Tuning(
+        val frequencyHz: Int,
+        val gainTenthDb: Int,      // -1 = tuner AGC
+        val ppm: Int
+    ) {
+        val megahertzText: String get() = "%.4f".format(frequencyHz / 1e6)
+        val gainText: String get() = if (gainTenthDb < 0) "auto" else "%.1f".format(gainTenthDb / 10.0)
+    }
+
     private val _state = MutableStateFlow(State.IDLE)
     val state: StateFlow<State> = _state
 
@@ -55,9 +65,70 @@ class DecoderViewModel(app: Application) : AndroidViewModel(app) {
     private val _clipping = MutableStateFlow(0.0)
     val clipping: StateFlow<Double> = _clipping
 
-    var frequencyHz: Int = 151_500_000
-    var gainTenthDb: Int = 250          // 25.0 dB; -1 = tuner AGC
-    var ppm: Int = 0
+    private val prefs = app.getSharedPreferences("tuning", android.content.Context.MODE_PRIVATE)
+
+    // Networks differ: 151.5 MHz is the NSW iFLOWS channel, but ALERT is
+    // deployed on other VHF channels elsewhere, so this has to be editable
+    // rather than baked in.
+    private val _tuning = MutableStateFlow(
+        Tuning(
+            frequencyHz = prefs.getInt("freq_hz", 151_500_000),
+            gainTenthDb = prefs.getInt("gain_tenth_db", 250),
+            ppm = prefs.getInt("ppm", 0)
+        )
+    )
+    val tuning: StateFlow<Tuning> = _tuning
+
+    val frequencyHz: Int get() = _tuning.value.frequencyHz
+    val gainTenthDb: Int get() = _tuning.value.gainTenthDb
+    val ppm: Int get() = _tuning.value.ppm
+
+    /**
+     * Apply operator-entered tuning. Persists it, and re-tunes live if we are
+     * already listening - rtl_tcp takes FREQ/GAIN commands at any time, so
+     * there is no need to tear the stream down.
+     *
+     * Returns null on success, or a message explaining what was rejected.
+     */
+    fun applyTuning(mhzText: String, gainText: String, ppmText: String): String? {
+        val mhz = mhzText.trim().toDoubleOrNull()
+            ?: return "Frequency must be a number in MHz, e.g. 151.5"
+        // R820T/R828D tuning range. Outside it the dongle silently reports
+        // success and delivers noise, which is worse than refusing.
+        if (mhz < 24.0 || mhz > 1766.0)
+            return "Frequency must be between 24 and 1766 MHz"
+
+        val g = gainText.trim().lowercase()
+        val gainTenths = when {
+            g.isEmpty() || g == "auto" || g == "agc" -> -1
+            else -> {
+                val v = g.toDoubleOrNull()
+                    ?: return "Gain must be a number in dB, or \"auto\""
+                (v.coerceIn(0.0, 49.6) * 10).toInt()
+            }
+        }
+
+        val p = ppmText.trim().let { if (it.isEmpty()) 0 else it.toIntOrNull() }
+            ?: return "PPM must be a whole number"
+        if (p < -200 || p > 200) return "PPM must be between -200 and 200"
+
+        val t = Tuning((mhz * 1e6).toInt(), gainTenths, p)
+        _tuning.value = t
+        prefs.edit()
+            .putInt("freq_hz", t.frequencyHz)
+            .putInt("gain_tenth_db", t.gainTenthDb)
+            .putInt("ppm", t.ppm)
+            .apply()
+
+        if (_state.value == State.LISTENING) {
+            // Socket write - must not touch the main thread.
+            viewModelScope.launch(Dispatchers.IO) {
+                source.tune(t.frequencyHz, t.gainTenthDb, t.ppm)
+                _status.value = "Listening on ${t.megahertzText} MHz  ·  gain ${t.gainText}"
+            }
+        }
+        return null
+    }
 
     val source = RtlSource()
     private var job: Job? = null
@@ -102,9 +173,10 @@ class DecoderViewModel(app: Application) : AndroidViewModel(app) {
                 withContext(Dispatchers.Main) { setError("Could not connect to the RTL2832U driver") }
                 return@launch
             }
-            source.tune(frequencyHz, gainTenthDb, ppm)
+            val t = _tuning.value
+            source.tune(t.frequencyHz, t.gainTenthDb, t.ppm)
             _state.value = State.LISTENING
-            _status.value = "Listening on ${frequencyHz / 1_000_000.0} MHz"
+            _status.value = "Listening on ${t.megahertzText} MHz  ·  gain ${t.gainText}"
 
             // 3-second decode windows, matching the desktop pipeline
             val windowBytes = AlertDsp.FS_IN * 2 * 3
