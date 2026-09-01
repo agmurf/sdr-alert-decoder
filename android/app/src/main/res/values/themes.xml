@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Platform theme so no extra Material Components dependency is needed;
+         all real styling is done in Compose. -->
+    <style name="Theme.AlertDecoder" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#0C3A85</item>
+        <item name="android:windowBackground">#F4F4F4</item>
+    </style>
+</resources>

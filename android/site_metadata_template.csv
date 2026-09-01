@@ -1,0 +1,18 @@
+# ALERT Decoder - site metadata template
+# Import via the app's "IMPORT SITE CSV" button. Nothing here is shipped with
+# the app; agencies supply their own register. Only "id" is required - any
+# column you leave out simply is not displayed.
+#
+#   id          sensor / ALERT address (integer, required)
+#   name        site name shown beside the reading
+#   type        free text, e.g. River / Rain / Batt
+#   unit        engineering unit shown after the scaled value
+#   multiplier  raw value x multiplier = engineering value
+#
+# Header spellings accepted for id: id, sensor_id, sensorid, errts id, address
+id,name,type,unit,multiplier
+7228,Example Creek D/S Levee,River,m,0.01
+7230,Example Creek U/S Levee,Rain,mm,0.254
+7231,Example Creek U/S Levee,Batt,V,0.1
+4079,Example Test Rig - River,River,m,0.001
+4080,Example Test Rig - Battery,Batt,V,0.1

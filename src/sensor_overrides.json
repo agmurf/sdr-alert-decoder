@@ -1,0 +1,35 @@
+{
+  "_comment": "Supplementary / test-rig sensors not present in Sensors.xlsx. Loaded AFTER the Excel file; entries here win. 'multiplier' converts the raw 11-bit ALERT value to 'unit' and overrides the sensor-type default (needed when a station's configured Scale differs from the network default, e.g. Scale 1000 = millimetres vs the usual centimetres).",
+  "sensors": [
+    {
+      "errts_id": 4079,
+      "site_number": "TESTRIG",
+      "site_name": "Test Rig - River Level (SDI 013HYDROLRARIVER1100 ch0)",
+      "sensor_type": "River",
+      "multiplier": 0.001,
+      "unit": "m",
+      "description": "Water Level (Scale 1000 = mm)",
+      "notes": "Format F-4, Scale 1000, Offset 0mm, Sens 10mm. LoRa-derived height sent as millimetres: 0.896 m -> raw 896."
+    },
+    {
+      "errts_id": 4080,
+      "site_number": "TESTRIG",
+      "site_name": "Test Rig - Battery",
+      "sensor_type": "Batt",
+      "multiplier": 0.1,
+      "unit": "V",
+      "description": "Battery Voltage",
+      "notes": "Format U-2, internal status block. 12.1 V -> raw 121."
+    },
+    {
+      "errts_id": 4078,
+      "site_number": "TESTRIG",
+      "site_name": "Test Rig - DI3 (station address 4078)",
+      "sensor_type": "River",
+      "multiplier": 0.001,
+      "unit": "m",
+      "description": "DI3 digital input (Sens 1mm) - NOT the LoRa channel",
+      "notes": "Shares the station address. Hamming distance 1 from 4079 - a single bit error in the river frame lands here, so treat a 4078 decode whose value matches 4079's as a probable ghost."
+    }
+  ]
+}

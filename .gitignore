@@ -1,0 +1,33 @@
+# Agency site register -- NOT ours to redistribute. Keep it local.
+Sensors.xlsx
+sensors.xlsx
+site_metadata.csv
+
+# Build output / installers
+*.exe
+!gradlew.bat
+_internal/
+_internal.OLD*/
+unins*.dat
+dist/
+build/
+app/build/
+.gradle/
+.kotlin/
+local.properties
+
+# Captures and run artefacts
+captures/
+*.bin
+*.iq
+soak_log*.csv
+soak_events.log
+soak_rtl.log
+soak_stdout.log
+sdi12_served.csv
+
+__pycache__/
+*.pyc
+.venv/
+.idea/
+.claude/
