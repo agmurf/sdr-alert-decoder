@@ -106,10 +106,11 @@ private fun DecoderScreen(
         }
 
         // ---- protocol selector ---------------------------------------
-        // One protocol at a time. iFLOWS and Enhanced iFLOWS share the same
-        // 300-baud air interface but different 40-bit frame formats, and
+        // One protocol at a time. ALERT Binary and Enhanced iFLOWS share the
+        // same 300-baud air interface but different 40-bit frame formats, and
         // Enhanced iFLOWS is loosely enough constrained that running both
-        // together produces ghost stations.
+        // together produces ghost stations. The hint under the row says which
+        // real transmitter each has been decoded from.
         var proto by remember { mutableStateOf(vm.protocol) }
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
@@ -127,11 +128,15 @@ private fun DecoderScreen(
                     )
                 ) {
                     Text(p.label, color = if (selected) Color.White else TextGrey,
-                        fontSize = 13.sp, fontWeight = FontWeight.Medium,
+                        fontSize = 12.sp, fontWeight = FontWeight.Medium,
                         maxLines = 1)
                 }
             }
         }
+        Text(
+            proto.hint, color = TextGrey, fontSize = 12.sp,
+            modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 8.dp)
+        )
 
         // ---- tuning --------------------------------------------------
         // Editable because ALERT is not on one channel nationally, and

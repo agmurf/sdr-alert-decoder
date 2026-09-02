@@ -30,18 +30,29 @@ class DecoderViewModel(app: Application) : AndroidViewModel(app) {
     enum class State { IDLE, WAITING_DRIVER, CONNECTING, LISTENING, ERROR }
 
     /**
-     * The three protocols, one at a time. iFLOWS and Enhanced iFLOWS share
-     * the 300-baud AFSK air interface but use different 40-bit frame
-     * formats; ALERT2 is an entirely different radio (4800 bps with FEC).
-     * They are never run together - see Alert1Formats for why.
+     * The three protocols, one at a time.
+     *
+     * Named for the FRAME FORMAT rather than the network. NSW operators call
+     * their network "iFLOWS", but its frames are the ALERT Binary format -
+     * all four bytes marked, no checksum - so labelling one option "iFLOWS"
+     * and the other "Enhanced iFLOWS" made them look like two flavours of
+     * one thing and named nothing an operator could check off air.
+     *
+     * ALERT Binary and Enhanced iFLOWS share the 300-baud AFSK air interface
+     * but carry different 40-bit frames; ALERT2 is an entirely different
+     * radio (4800 bps with FEC). They are never run together - see
+     * Alert1Formats for why.
      */
-    enum class Protocol(val label: String) {
-        IFLOWS("iFLOWS"),
-        ENHANCED_IFLOWS("Enhanced iFLOWS"),
-        ALERT2("ALERT2")
+    enum class Protocol(val label: String, val hint: String) {
+        BINARY("ALERT Binary",
+            "All four bytes marked, no checksum. What the live 151.5 MHz network sends."),
+        ENHANCED_IFLOWS("Enhanced iFLOWS",
+            "One byte marked plus a 6-bit CRC. What the ERT-A2 test rig sends."),
+        ALERT2("ALERT2",
+            "4800 bps with FEC - a different radio entirely.")
     }
 
-    var protocol: Protocol = Protocol.IFLOWS
+    var protocol: Protocol = Protocol.BINARY
 
     /** What the radio is tuned to, as the UI shows and edits it. */
     data class Tuning(
@@ -197,8 +208,8 @@ class DecoderViewModel(app: Application) : AndroidViewModel(app) {
                 val now = fmt.format(Date())
                 val add = ArrayList<Row>()
 
-                if (protocol == Protocol.IFLOWS || protocol == Protocol.ENHANCED_IFLOWS) {
-                    AlertDsp.frameFormat = if (protocol == Protocol.IFLOWS)
+                if (protocol == Protocol.BINARY || protocol == Protocol.ENHANCED_IFLOWS) {
+                    AlertDsp.frameFormat = if (protocol == Protocol.BINARY)
                         Alert1Formats.BINARY else Alert1Formats.ENHANCED_IFLOWS
                     val readings = try { AlertDsp.decodeWindow(buf) } catch (e: Exception) { emptyList() }
                     readings.forEach {

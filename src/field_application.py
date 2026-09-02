@@ -142,11 +142,25 @@ class ALERTFieldApp:
 
         ttk.Label(control_frame, text="Protocol:").grid(
             row=1, column=7, sticky=tk.E, padx=(15, 2))
-        self.protocol_var = tk.StringVar(value="iFLOWS")
+        # Named for the FRAME FORMAT, not the network. NSW operators call
+        # their network "iFLOWS", but its frames are the ALERT Binary format
+        # (all four bytes marked, no checksum) - so a label of "iFLOWS" here
+        # named neither the format nor anything an operator could check.
+        self.protocol_var = tk.StringVar(value="ALERT Binary")
         self.protocol_box = ttk.Combobox(
-            control_frame, textvariable=self.protocol_var, width=16,
-            state="readonly", values=("iFLOWS", "Enhanced iFLOWS", "ALERT2"))
+            control_frame, textvariable=self.protocol_var,
+            state="readonly", width=16,
+            values=("ALERT Binary", "Enhanced iFLOWS", "ALERT2"))
+        self.protocol_box.bind("<<ComboboxSelected>>", self._show_protocol_hint)
         self.protocol_box.grid(row=1, column=8, sticky=tk.W, padx=2)
+
+        # Says which real transmitter each format has been decoded from, so
+        # the choice can be made without reading the spec.
+        self.protocol_hint = tk.StringVar()
+        ttk.Label(control_frame, textvariable=self.protocol_hint,
+                  foreground=self.TEXT_GREY).grid(
+                      row=2, column=5, columnspan=4, sticky=tk.W, padx=2)
+        self._show_protocol_hint()
 
         self.retune_btn = ttk.Button(control_frame, text="Apply Tuning",
                                      command=self.apply_tuning,
@@ -229,6 +243,18 @@ class ALERTFieldApp:
             self.log("RTL-SDR not found. You can still decode WAV files.")
             self.log("For live monitoring, install RTL-SDR tools.")
 
+    PROTOCOL_HINTS = {
+        "ALERT Binary": ("all four bytes marked, no checksum - what the live "
+                         "151.5 network sends (the live network)"),
+        "Enhanced iFLOWS": ("one byte marked plus a 6-bit CRC - what the "
+                            "ERT-A2 test rig sends"),
+        "ALERT2": "4800 bps with FEC - a different radio entirely",
+    }
+
+    def _show_protocol_hint(self, _event=None):
+        self.protocol_hint.set(
+            self.PROTOCOL_HINTS.get(self.protocol_var.get(), ""))
+
     def _get_gain(self):
         """Tuner gain in dB from the GUI. Blank or 'auto' means tuner AGC.
 
@@ -309,7 +335,7 @@ class ALERTFieldApp:
         proto = self.protocol_var.get()
         self.decoder = None
         self.decoder2 = None
-        if proto == "iFLOWS":
+        if proto == "ALERT Binary":
             self.decoder = IQAlertDecoder(sample_rate=self.IQ_RATE,
                                           callback=self.on_message_decoded,
                                           formats=("BINARY",))

@@ -5,31 +5,24 @@ OTG and does the whole DSP chain itself — no PC, no network, no server.
 
 ## What it decodes
 
-**ALERT iFLOWS** as used on 151.5 MHz in NSW: AFSK mark 1300.8 Hz / space
+The 151.5 MHz ALERT air interface used in NSW: AFSK mark 1300.8 Hz / space
 2109.4 Hz over narrowband FM, 300 baud, four 10-bit UART bytes carrying a
 13-bit sensor ID and an 11-bit value.
 
-Note there are **three distinct ALERT protocols**, and they are not
-interchangeable:
-
-| Protocol | Status | Supported here |
-|---|---|---|
-| **ALERT Binary** | legacy, still in use | not verified — see below |
-| **ALERT iFLOWS** | what this network uses | **yes, decoded and field-proven** |
-| **ALERT2** | the next target | no — different PHY, needs new work |
-
-This decoder was developed and verified against iFLOWS traffic only (live network
-Creek, the live network, and the 4078 test rig). It has never been tested
-against ALERT Binary traffic, so treat Binary support as unproven rather than
-assumed.
+Two different 40-bit frame formats ride that same air interface, and a third
+protocol (ALERT2) uses a different radio altogether. All three are decoded
+here; see **Protocols** below for how they are told apart. ALERT Binary and
+Enhanced iFLOWS are both proven against real transmitters — the live network
+and the 4078 test rig respectively. ALERT2 is implemented from the spec and
+unit-tested end to end, but has not yet been verified against a real ALERT2
+transmitter.
 
 Ported line-for-line from the desktop Python decoder in `../src`, including the
 four-sideband matched filter that gave ~8 dB over the older single-sideband
 approach, Gardner timing recovery, brute-force symbol phases, and vote
 consensus for false-positive rejection.
 
-Not decoded (yet): ALERT ASCII, ENHANCED BINARY (6-bit CRC), EXTENDED, and
-ALERT2 — ALERT2 is a different PHY entirely and needs new work.
+Not decoded (yet): ALERT ASCII and EXTENDED.
 
 ## Site metadata is NOT bundled
 
@@ -54,11 +47,17 @@ columns are ignored, so most agency exports import unchanged.
 
 ## Protocols - one at a time
 
-| Selector | Frame format | Notes |
+| Selector | How to recognise it off air | Decoded from |
 |---|---|---|
-| **iFLOWS** (default) | ALERT Binary, markers 01/01/11/11 | what the live network sends |
-| **Enhanced iFLOWS** | only byte 0 marked, 6-bit CRC | what the 4078 test rig sends |
+| **ALERT Binary** (default) | all four bytes marked (01/01/11/11), no checksum | the live 151.5 MHz network — the live network |
+| **Enhanced iFLOWS** | only byte 0 marked, 6-bit CRC in byte 3 | the 4078 ERT-A2 test rig |
 | **ALERT2** | 4800 bps, RS + convolutional FEC | separate radio entirely |
+
+The selectors are named for the **frame format**, not the network. NSW
+operators call their network "iFLOWS", but its frames are the ALERT Binary
+format — so the old labels ("iFLOWS" and "Enhanced iFLOWS") read as two
+flavours of one protocol and named nothing you could check against a capture.
+Each selector now carries a one-line description in the app.
 
 They are never run together. Enhanced iFLOWS has only 8 bits of constraint
 (2 marker bits plus the CRC) against Binary's 16 fixed bits, so a strong
