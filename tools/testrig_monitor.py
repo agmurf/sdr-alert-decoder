@@ -2,7 +2,7 @@
 
 Streams raw IQ from rtl_sdr, decodes with the AFSK-over-NBFM decoder, and
 prints every decode with engineering units. Test-rig sensors are highlighted;
-everything else (other stations on the network) is still shown so you can see
+everything else on the network is still shown so you can see
 the receiver is healthy between the rig's ~5 minute transmissions.
 
 Run:

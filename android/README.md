@@ -49,7 +49,7 @@ columns are ignored, so most agency exports import unchanged.
 
 | Selector | How to recognise it off air | Decoded from |
 |---|---|---|
-| **ALERT Binary** (default) | all four bytes marked (01/01/11/11), no checksum | the live 151.5 MHz network — the live network |
+| **ALERT Binary** (default) | all four bytes marked (01/01/11/11), no checksum | the live 151.5 MHz network |
 | **Enhanced iFLOWS** | only byte 0 marked, 6-bit CRC in byte 3 | the 4078 ERT-A2 test rig |
 | **ALERT2** | 4800 bps, RS + convolutional FEC | separate radio entirely |
 

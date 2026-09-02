@@ -245,7 +245,7 @@ class ALERTFieldApp:
 
     PROTOCOL_HINTS = {
         "ALERT Binary": ("all four bytes marked, no checksum - what the live "
-                         "151.5 network sends (the live network)"),
+                         "151.5 network sends"),
         "Enhanced iFLOWS": ("one byte marked plus a 6-bit CRC - what the "
                             "ERT-A2 test rig sends"),
         "ALERT2": "4800 bps with FEC - a different radio entirely",
