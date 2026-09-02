@@ -6,6 +6,7 @@ implementation and an Android app that hosts the SDR itself.
 Point a cheap RTL-SDR at 151.5 MHz and read exactly what a field station
 put on the radio: sensor ID, value, and the four raw bytes it came from.
 Whatever a logger *claims* it is sending, this says what actually went out.
+Requires RTL-SDR Driver to be installed. https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro&pcampaignid=web_share
 
 ---
 
