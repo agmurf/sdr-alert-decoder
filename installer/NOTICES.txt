@@ -1,0 +1,40 @@
+SDR ALERT Decoder - third-party components
+==========================================
+
+The application itself is MIT licensed (see LICENSE).
+
+rtl-sdr command-line tools (rtl_sdr.exe, rtl_test.exe, rtlsdr.dll and the
+supporting DLLs in the rtl-sdr folder) are from the rtl-sdr-blog distribution,
+version 1.3.6, and are licensed under the GNU General Public License version 2
+or later - NOT under this application's MIT licence.
+
+  Source code: https://github.com/rtlsdrblog/rtl-sdr-blog
+  Licence text: rtl-sdr/COPYING in this installation
+
+Those tools are separate programs that this application invokes; they are
+aggregated with it here for convenience, not linked into it. You may obtain,
+modify and redistribute their complete source under the terms of the GPL from
+the URL above.
+
+SITE METADATA IS NOT INCLUDED
+=============================
+
+This installer ships NO site register. Sensor registers are agency data and
+not ours to redistribute, so the decoder reports exactly what came off the
+air - sensor ID, value and timestamp.
+
+Readings from stations it has no metadata for are shown with their raw value
+and labelled "no site register loaded - raw value". That is normal, not an
+error. To label readings, place your own agency's Sensors.xlsx next to the
+installed executable.
+
+WHAT THIS DOES AND DOES NOT DO
+==============================
+
+It is a passive receiver. It decodes ALERT flood telemetry that is already
+being broadcast; it transmits nothing.
+
+Decoded values are NOT an official data source. Check the transmitting
+agency's own feed before acting on any reading - a decode can be wrong, and
+ALERT1 has no way to signal "no reading" (a station holds its last good value
+instead, which reads as fresh data).

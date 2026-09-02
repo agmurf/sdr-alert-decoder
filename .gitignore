@@ -31,3 +31,6 @@ __pycache__/
 .venv/
 .idea/
 .claude/
+
+# Installer staging (build output)
+installer/payload/

@@ -245,7 +245,7 @@ class ALERTFieldApp:
 
     PROTOCOL_HINTS = {
         "ALERT Binary": ("all four bytes marked, no checksum - what the live "
-                         "151.5 network sends"),
+                         "151.5 network sends (Kelso Creek, Liverpool)"),
         "Enhanced iFLOWS": ("one byte marked plus a 6-bit CRC - what the "
                             "ERT-A2 test rig sends"),
         "ALERT2": "4800 bps with FEC - a different radio entirely",
@@ -680,10 +680,14 @@ class ALERTFieldApp:
             site_number = sensor_info.get('site_number', '')
             decoded_value = self.sensor_db.format_decoded_value(sensor, value)
         else:
-            # Station decoded cleanly but isn't in Sensors.xlsx - show it
-            # rather than hide it (the database is not exhaustive).
+            # Station decoded cleanly but isn't in the site register - show it
+            # rather than hide it (the register is not exhaustive, and an
+            # installed copy ships without one at all, since site registers
+            # are agency data and not ours to redistribute).
             sensor_type = "?"
-            site_name = "*** NOT in Sensors.xlsx (raw value) ***"
+            site_name = ("no site register loaded - raw value"
+                         if not getattr(self.sensor_db, 'sensors', None)
+                         else "not in site register - raw value")
             site_number = ""
             decoded_value = str(value)
 
