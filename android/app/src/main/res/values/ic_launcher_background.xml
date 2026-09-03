@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- White, so the mast reads as the app's blue on any launcher wallpaper.
+         The blue is the same #10469E as the app bar. -->
+    <color name="ic_launcher_background">#FFFFFF</color>
+</resources>

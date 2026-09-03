@@ -1,0 +1,49 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group android:scaleX="0.8640" android:scaleY="0.8640"
+        android:translateX="7.342" android:translateY="6.262">
+        <path
+            android:strokeColor="#10469E"
+            android:strokeWidth="5.2"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M44.91,50.25 A10.5,10.5 0 1 1 63.09,50.25" />
+        <path
+            android:strokeColor="#10469E"
+            android:strokeWidth="5.2"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M37.98,54.25 A18.5,18.5 0 1 1 70.02,54.25" />
+        <path
+            android:strokeColor="#10469E"
+            android:strokeWidth="5.2"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M31.05,58.25 A26.5,26.5 0 1 1 76.95,58.25" />
+        <path
+            android:strokeColor="#10469E"
+            android:strokeWidth="5.2"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M54.0,50.00 L35.0,92.0" />
+        <path
+            android:strokeColor="#10469E"
+            android:strokeWidth="5.2"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M54.0,50.00 L73.0,92.0" />
+        <path
+            android:strokeColor="#10469E"
+            android:strokeWidth="5.2"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M40.43,80.0 L67.57,80.0" />
+        <path
+            android:fillColor="#10469E"
+            android:fillType="evenOdd"
+            android:pathData="M54.0,45.0 m-5.6,0 a5.6,5.6 0 1 1 11.2,0 a5.6,5.6 0 1 1 -11.2,0 M54.0,45.0 m-2.0,0 a2.0,2.0 0 1 0 4.0,0 a2.0,2.0 0 1 0 -4.0,0" />
+    </group>
+</vector>
