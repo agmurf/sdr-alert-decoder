@@ -301,7 +301,9 @@ work. One did exactly that and overwrote the GUI source; it was recovered from A
   `field-tests`, `build-deploy`, `decoder-architecture`, `hardware-plan`, `diary`).
   Query it before asserting anything about past work; several entries are explicit
   *corrections* of earlier entries, so read the dates.
-- **`handover.md`** (working copy, not in the repo) — the 2026-08-29 radio → SDI-12
-  handover. Still useful for the rig's behaviour, but see §9.3 before trusting its
-  bit-12 sections.
+- **`handover-sdi12.md`** (working copy and the share, deliberately not in the repo) —
+  the 2026-08-29 radio → SDI-12 handover. Still useful for the rig's behaviour, but it
+  opens with a retraction banner: see §9.3 before trusting its bit-12 sections.
+  Note the lower-case name — it must **not** be called `handover.md`, because Windows
+  treats that as the same file as `HANDOVER.md` and one overwrites the other.
 - **`README.md`**, **`android/README.md`**, **`installer/NOTICES.txt`** — user-facing docs.
