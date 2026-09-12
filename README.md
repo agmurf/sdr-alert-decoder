@@ -8,6 +8,8 @@ put on the radio: sensor ID, value, and the four raw bytes it came from.
 Whatever a logger *claims* it is sending, this says what actually went out.
 Requires RTL-SDR Driver to be installed. https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro&pcampaignid=web_share
 
+**Picking this up cold?** [HANDOVER.md](HANDOVER.md) covers the state of play, what is proven versus merely built, and the traps that have already cost time.
+
 ---
 
 ## Parts
